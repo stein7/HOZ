@@ -135,15 +135,24 @@ def main():
 
     train_thin = args.train_thin
     train_scalars = ScalarMeanTracker()
-
+    
     try:
         while train_total_ep < args.max_ep:
-
+            if not any(p.is_alive() for p in processes):
+                raise RuntimeError("All training processes have terminated unexpectedly.")
+            try:
+                train_result = train_res_queue.get(timeout=10)  # 10초 타임아웃
+            except train_res_queue.Empty:
+                print("Warning: train_res_queue.get() timed out.")
+                continue
+            if train_result is None:
+                raise RuntimeError("A training process has encountered an error.")
+            
             train_result = train_res_queue.get()
             train_scalars.add_scalars(train_result)
             train_total_ep += 1
             n_frames += train_result['ep_length']
-
+            
             if (train_total_ep % train_thin) == 0:
                 log_writer.add_scalar('n_frames', n_frames, train_total_ep)
                 tracked_means = train_scalars.pop_and_reset()
