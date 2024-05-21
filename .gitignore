@@ -1,0 +1,10 @@
+__pycache__/*
+datasets/__pycache__/*
+models/__pycache__/*
+runners/__pycache__/*
+utils/__pycache__/*
+agents/__pycache__/*
+data/*
+datasets/Scene_Data/*
+episodes/__pycache__/*
+optimizers/__pycache__/*
